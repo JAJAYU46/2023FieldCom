@@ -1,5 +1,13 @@
+##For RPI
+import serial
+import time
+
 import cv2
 import numpy as np
+
+##For RPI(有差了Arduino再解開註解)
+#arduino=serial.Serial(port='/dev/ttyACM0', baudrate=9600,timeout=.1)
+
 #import matplotlib.pylab as plt
 '''
 This code is now able to find pure 2 average lines&funciton & delete unused 註解&抓出兩線交點 &Logic(Flag to Arduino) 
@@ -10,6 +18,7 @@ This code is now able to find pure 2 average lines&funciton & delete unused 註�
 &變成了SpeedPercentFlag的-100%~0~100%
 &可以自由調整:濾色,blurKernal,CannyLeast,CanntTop的參數
 &加了AverageInsecX,Y，每10筆Frame資料得出的intersection去計算交點(那個藍色點點)
+Logic輸出來加了給RPI的東西
 '''
 #【讀取影片】
 cap=cv2.VideoCapture('./GFencePhoto/GrassFenceV1.mp4') #讀取影片
@@ -184,7 +193,7 @@ def FindHoughLine(CannyImgNow):#傳入一個輪廓img(CannyImg)，傳出那幾�
             draw_averLines(copyImgF1, parallel_line, [0, 255, 0], 3)
 
         InSecX,InSecY,copyImgF1=lineIntersection(left_line,right_line,copyImgF1)
-        LogicDetermed(InSecX,InSecY,imgF1)
+        #LogicDetermed(InSecX,InSecY,imgF1)
     else :
         print("Can't detect any line")
         left_line=[[0,0],[0,copyImgF1.shape[0]]]
@@ -472,6 +481,11 @@ while True:
         print("Average Intercept=(%d,%d)"%(AverageInSecX,AverageInSecY))
         cv2.circle(copyimgF1,(AverageInSecX,AverageInSecY) , radius=5, color=(255,255,0), thickness=-1)
         cv2.imshow('AverageInterCept',copyimgF1)
+        SpeedPercentFlag=LogicDetermed(AverageInSecX,AverageInSecY,imgF1)
+        
+        ###用來傳入Arduino###(有插入Arduino再解開註解)
+        #arduino.write(bytes(SpeedPercentFlag,'utf-8'))
+
 
 
 
